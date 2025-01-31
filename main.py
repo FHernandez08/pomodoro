@@ -9,12 +9,30 @@ FONT_NAME = "Courier"
 WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
-
+reps = 0
 # ---------------------------- TIMER RESET ------------------------------- # 
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
-    count_down(5 * 60)
+    global reps
+    reps += 1
+
+    work_sec = WORK_MIN * 60
+    short_break_sec = SHORT_BREAK_MIN * 60
+    long_break_sec = LONG_BREAK_MIN * 60
+
+    # if on 8th rep
+    if reps % 8 == 0:
+        count_down(long_break_sec)
+        title_label.config(text="Break", fg=RED)
+    # if on 2nd/4th/6th rep
+    elif reps % 2 == 0:
+        count_down(short_break_sec)
+        title_label.config(text="Break", fg=PINK)
+    # if on 1st/3rd/5th/7th rep
+    else:
+        count_down(work_sec)
+        title_label.config(text="Work", fg=GREEN)
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- # 
 def count_down(count):
     count_min = math.floor(count / 60)
@@ -25,6 +43,8 @@ def count_down(count):
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if count > 0:
         window.after(1000, count_down, count - 1)
+    else:
+        start_timer()
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
@@ -44,7 +64,7 @@ reset_btn = Button(text="Reset", highlightthickness=0)
 reset_btn.grid(column=2, row=2)
 
 # checkmark label
-checkmark_label = Label(text="✓", fg=GREEN, bg=YELLOW)
+checkmark_label = Label(fg=GREEN, bg=YELLOW)
 checkmark_label.grid(column=1, row=3)
 
 canvas = Canvas(width=200, height=224, bg=YELLOW, highlightthickness=0)
